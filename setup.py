@@ -32,5 +32,8 @@ setup(
     include_package_data=True,
     zip_safe=False,
     python_requires=">=3.6",
-    install_requires=["httpx>=0.12,<0.13", "asynctest"],
+    install_requires=[
+        "httpx@https://github.com/encode/httpx/archive/master.zip",
+        "asynctest",
+    ],
 )
