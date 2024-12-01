@@ -1,21 +1,9 @@
 import inspect
+from collections.abc import Generator
 from contextlib import contextmanager
 from functools import partial, update_wrapper, wraps
 from types import TracebackType
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Generator,
-    List,
-    NewType,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-    cast,
-    overload,
-)
+from typing import Any, Callable, NewType, Optional, Union, cast, overload
 
 import httpx
 
@@ -51,7 +39,7 @@ class Router:
         self.routes = RouteList()
         self.calls = CallList()
 
-        self._snapshots: List[Tuple] = []
+        self._snapshots: list[tuple] = []
         self.snapshot()
 
     def clear(self) -> None:
@@ -334,7 +322,7 @@ class MockRouter(Router):
             assert_all_mocked=assert_all_mocked,
             base_url=base_url,
         )
-        self.Mocker: Optional[Type[Mocker]] = None
+        self.Mocker: Optional[type[Mocker]] = None
         self._using = using
 
     @overload
@@ -381,7 +369,7 @@ class MockRouter(Router):
             # - Only stage when using local ctx `with respx.mock(...) as respx_mock:`
             # - First stage when using local decorator `@respx.mock(...)`
             #   FYI, global ctx `with respx.mock:` hits __enter__ directly
-            settings: Dict[str, Any] = {
+            settings: dict[str, Any] = {
                 "base_url": base_url,
                 "using": using,
             }
@@ -430,7 +418,7 @@ class MockRouter(Router):
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]] = None,
+        exc_type: Optional[type[BaseException]] = None,
         exc_value: Optional[BaseException] = None,
         traceback: Optional[TracebackType] = None,
     ) -> None:

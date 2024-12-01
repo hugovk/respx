@@ -1,15 +1,6 @@
+from collections.abc import Coroutine
 from types import TracebackType
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Coroutine,
-    List,
-    Optional,
-    Type,
-    Union,
-    cast,
-)
+from typing import TYPE_CHECKING, Any, Callable, Optional, Union, cast
 from warnings import warn
 
 import httpx
@@ -55,7 +46,7 @@ class MockTransport(httpx.MockTransport):
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]] = None,
+        exc_type: Optional[type[BaseException]] = None,
         exc_value: Optional[BaseException] = None,
         traceback: Optional[TracebackType] = None,
     ) -> None:
@@ -68,7 +59,7 @@ class MockTransport(httpx.MockTransport):
 
 class TryTransport(BaseTransport, AsyncBaseTransport):
     def __init__(
-        self, transports: List[Union[BaseTransport, AsyncBaseTransport]]
+        self, transports: list[Union[BaseTransport, AsyncBaseTransport]]
     ) -> None:
         self.transports = transports
 

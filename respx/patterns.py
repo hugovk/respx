@@ -4,25 +4,13 @@ import operator
 import pathlib
 import re
 from abc import ABC
+from collections.abc import Mapping, Sequence
 from enum import Enum
 from functools import reduce
 from http.cookies import SimpleCookie
+from re import Pattern as RegexPattern
 from types import MappingProxyType
-from typing import (
-    Any,
-    Callable,
-    ClassVar,
-    Dict,
-    List,
-    Mapping,
-    Optional,
-    Pattern as RegexPattern,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import Any, Callable, ClassVar, Optional, Union
 from unittest.mock import ANY
 from urllib.parse import urljoin
 
@@ -67,14 +55,14 @@ class Match:
 
 class Pattern(ABC):
     key: ClassVar[str]
-    lookups: ClassVar[Tuple[Lookup, ...]] = (Lookup.EQUAL,)
+    lookups: ClassVar[tuple[Lookup, ...]] = (Lookup.EQUAL,)
 
     lookup: Lookup
     base: Optional["Pattern"]
     value: Any
 
     # Automatically register all the subclasses in this dict
-    __registry: ClassVar[Dict[str, Type["Pattern"]]] = {}
+    __registry: ClassVar[dict[str, type["Pattern"]]] = {}
     registry = MappingProxyType(__registry)
 
     def __init_subclass__(cls) -> None:
@@ -212,7 +200,7 @@ class PathPattern(Pattern):
 
 
 class _And(Pattern):
-    value: Tuple[Pattern, Pattern]
+    value: tuple[Pattern, Pattern]
 
     def __repr__(self):  # pragma: nocover
         a, b = self.value
@@ -235,7 +223,7 @@ class _And(Pattern):
 
 
 class _Or(Pattern):
-    value: Tuple[Pattern, Pattern]
+    value: tuple[Pattern, Pattern]
 
     def __repr__(self):  # pragma: nocover
         a, b = self.value
@@ -290,7 +278,7 @@ class MultiItemsMixin:
 
     def _multi_items(
         self, value: Any, *, parse_any: bool = False
-    ) -> Tuple[Tuple[str, Tuple[Any, ...]], ...]:
+    ) -> tuple[tuple[str, tuple[Any, ...]], ...]:
         return tuple(
             (
                 key,
@@ -339,18 +327,18 @@ class Headers(MultiItemsMixin, Pattern):
 class Cookies(Pattern):
     key = "cookies"
     lookups = (Lookup.CONTAINS, Lookup.EQUAL)
-    value: Set[Tuple[str, str]]
+    value: set[tuple[str, str]]
 
     def __hash__(self):
         return hash((self.__class__, self.lookup, tuple(sorted(self.value))))
 
-    def clean(self, value: CookieTypes) -> Set[Tuple[str, str]]:
+    def clean(self, value: CookieTypes) -> set[tuple[str, str]]:
         if isinstance(value, dict):
             return set(value.items())
 
         return set(value)
 
-    def parse(self, request: httpx.Request) -> Set[Tuple[str, str]]:
+    def parse(self, request: httpx.Request) -> set[tuple[str, str]]:
         headers = request.headers
 
         cookie_header = headers.get("cookie")
@@ -362,7 +350,7 @@ class Cookies(Pattern):
 
         return {(cookie.key, cookie.value) for cookie in cookies.values()}
 
-    def _contains(self, value: Set[Tuple[str, str]]) -> Match:
+    def _contains(self, value: set[tuple[str, str]]) -> Match:
         return Match(bool(self.value & value))
 
 
@@ -517,7 +505,7 @@ class JSON(ContentMixin, PathPattern):
     key = "json"
     value: str
 
-    def clean(self, value: Union[str, List, Dict]) -> str:
+    def clean(self, value: Union[str, list, dict]) -> str:
         return self.hash(value)
 
     def parse(self, request: httpx.Request) -> str:
@@ -539,7 +527,7 @@ class JSON(ContentMixin, PathPattern):
 
         return self.hash(value)
 
-    def hash(self, value: Union[str, List, Dict]) -> str:
+    def hash(self, value: Union[str, list, dict]) -> str:
         return jsonlib.dumps(value, sort_keys=True)
 
 
@@ -548,7 +536,7 @@ class Data(MultiItemsMixin, Pattern):
     key = "data"
     value: MultiItems
 
-    def clean(self, value: Dict) -> MultiItems:
+    def clean(self, value: dict) -> MultiItems:
         return MultiItems(
             (key, "" if value is None else str(value)) for key, value in value.items()
         )
@@ -563,7 +551,7 @@ class Files(MultiItemsMixin, Pattern):
     key = "files"
     value: MultiItems
 
-    def _normalize_file_value(self, value: FileTypes) -> Tuple[Any, Any]:
+    def _normalize_file_value(self, value: FileTypes) -> tuple[Any, Any]:
         # Mimic httpx `FileField` to normalize `files` kwarg to shortest tuple style
         if isinstance(value, tuple):
             filename, fileobj = value[:2]
@@ -677,8 +665,8 @@ def parse_url(value: Union[httpx.URL, str, RawURL]) -> httpx.URL:
 
 def parse_url_patterns(
     url: Optional[URLPatternTypes], exact: bool = True
-) -> Dict[str, Pattern]:
-    bases: Dict[str, Pattern] = {}
+) -> dict[str, Pattern]:
+    bases: dict[str, Pattern] = {}
     if not url or url == "all":
         return bases
 
@@ -719,7 +707,7 @@ def merge_patterns(pattern: Pattern, **bases: Pattern) -> Pattern:
         return pattern
 
     # Flatten pattern
-    patterns: List[Pattern] = list(filter(None, iter(pattern)))
+    patterns: list[Pattern] = list(filter(None, iter(pattern)))
 
     if patterns:
         if "host" in (_pattern.key for _pattern in patterns):

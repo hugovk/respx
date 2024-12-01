@@ -1,58 +1,49 @@
-from typing import (
-    IO,
-    Any,
+from collections.abc import (
     AsyncIterable,
     Awaitable,
-    Callable,
-    Dict,
     Iterable,
     Iterator,
-    List,
     Mapping,
-    Optional,
-    Pattern,
     Sequence,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
 )
+from re import Pattern
+from typing import IO, Any, Callable, Optional, TypeVar, Union
 
 import httpx
 
-URL = Tuple[
+URL = tuple[
     bytes,  # scheme
     bytes,  # host
     Optional[int],  # port
     bytes,  # path
 ]
-Headers = List[Tuple[bytes, bytes]]
+Headers = list[tuple[bytes, bytes]]
 Content = Union[str, bytes, Iterable[bytes], AsyncIterable[bytes]]
 
 HeaderTypes = Union[
     httpx.Headers,
-    Dict[str, str],
-    Dict[bytes, bytes],
-    Sequence[Tuple[str, str]],
-    Sequence[Tuple[bytes, bytes]],
+    dict[str, str],
+    dict[bytes, bytes],
+    Sequence[tuple[str, str]],
+    Sequence[tuple[bytes, bytes]],
 ]
-CookieTypes = Union[Dict[str, str], Sequence[Tuple[str, str]]]
+CookieTypes = Union[dict[str, str], Sequence[tuple[str, str]]]
 
 DefaultType = TypeVar("DefaultType", bound=Any)
 
 URLPatternTypes = Union[str, Pattern[str], URL, httpx.URL]
 QueryParamTypes = Union[
-    bytes, str, List[Tuple[str, Any]], Dict[str, Any], Tuple[Tuple[str, Any], ...]
+    bytes, str, list[tuple[str, Any]], dict[str, Any], tuple[tuple[str, Any], ...]
 ]
 
 ResolvedResponseTypes = Optional[Union[httpx.Request, httpx.Response]]
 RouteResultTypes = Union[ResolvedResponseTypes, Awaitable[ResolvedResponseTypes]]
 CallableSideEffect = Callable[..., RouteResultTypes]
-SideEffectListTypes = Union[httpx.Response, Exception, Type[Exception]]
+SideEffectListTypes = Union[httpx.Response, Exception, type[Exception]]
 SideEffectTypes = Union[
     CallableSideEffect,
     Exception,
-    Type[Exception],
+    type[Exception],
     Iterator[SideEffectListTypes],
 ]
 
@@ -62,10 +53,10 @@ FileTypes = Union[
     # file (or bytes)
     FileContent,
     # (filename, file (or bytes))
-    Tuple[Optional[str], FileContent],
+    tuple[Optional[str], FileContent],
     # (filename, file (or bytes), content_type)
-    Tuple[Optional[str], FileContent, Optional[str]],
+    tuple[Optional[str], FileContent, Optional[str]],
     # (filename, file (or bytes), content_type, headers)
-    Tuple[Optional[str], FileContent, Optional[str], Mapping[str, str]],
+    tuple[Optional[str], FileContent, Optional[str], Mapping[str, str]],
 ]
-RequestFiles = Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]
+RequestFiles = Union[Mapping[str, FileTypes], Sequence[tuple[str, FileTypes]]]

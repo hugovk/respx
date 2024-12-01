@@ -1,16 +1,6 @@
 import inspect
-from typing import (
-    Any,
-    Dict,
-    Iterator,
-    List,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Tuple,
-    Type,
-    Union,
-)
+from collections.abc import Iterator, Sequence
+from typing import Any, NamedTuple, Optional, Union
 from unittest import mock
 from warnings import warn
 
@@ -139,7 +129,7 @@ class Route:
         self._side_effect: Optional[SideEffectTypes] = None
         self._pass_through: bool = False
         self._name: Optional[str] = None
-        self._snapshots: List[Tuple] = []
+        self._snapshots: list[tuple] = []
         self.calls = CallList(name=self)
         self.snapshot()
 
@@ -156,7 +146,7 @@ class Route:
         self.side_effect = side_effect
         return side_effect
 
-    def __mod__(self, response: Union[int, Dict[str, Any], httpx.Response]) -> "Route":
+    def __mod__(self, response: Union[int, dict[str, Any], httpx.Response]) -> "Route":
         if isinstance(response, int):
             self.return_value = httpx.Response(status_code=response)
 
@@ -277,7 +267,7 @@ class Route:
         content: Optional[Content] = None,
         text: Optional[str] = None,
         html: Optional[str] = None,
-        json: Optional[Union[str, List, Dict]] = None,
+        json: Optional[Union[str, list, dict]] = None,
         stream: Optional[Union[httpx.SyncByteStream, httpx.AsyncByteStream]] = None,
         content_type: Optional[str] = None,
         http_version: Optional[str] = None,
@@ -316,9 +306,9 @@ class Route:
 
     def _next_side_effect(
         self,
-    ) -> Union[CallableSideEffect, Exception, Type[Exception], httpx.Response]:
+    ) -> Union[CallableSideEffect, Exception, type[Exception], httpx.Response]:
         assert self._side_effect is not None
-        effect: Union[CallableSideEffect, Exception, Type[Exception], httpx.Response]
+        effect: Union[CallableSideEffect, Exception, type[Exception], httpx.Response]
         if isinstance(self._side_effect, Iterator):
             effect = next(self._side_effect)
         else:
@@ -412,7 +402,7 @@ class Route:
         Returns None for a non-matching route, mocked response for a match,
         or input request for pass-through.
         """
-        context: Dict[str, Any] = {}
+        context: dict[str, Any] = {}
 
         if self._pattern:
             match = self._pattern.match(request)
@@ -428,8 +418,8 @@ class Route:
 
 
 class RouteList:
-    _routes: List[Route]
-    _names: Dict[str, Route]
+    _routes: list[Route]
+    _names: dict[str, Route]
 
     def __init__(self, routes: Optional["RouteList"] = None) -> None:
         if routes is None:

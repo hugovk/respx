@@ -1,7 +1,7 @@
 import inspect
 from abc import ABC
 from types import MappingProxyType
-from typing import TYPE_CHECKING, ClassVar, Dict, List, Type
+from typing import TYPE_CHECKING, ClassVar
 from unittest import mock
 
 import httpcore
@@ -19,14 +19,14 @@ __all__ = ["Mocker", "HTTPCoreMocker"]
 
 
 class Mocker(ABC):
-    _patches: ClassVar[List[mock._patch]]
+    _patches: ClassVar[list[mock._patch]]
     name: ClassVar[str]
-    routers: ClassVar[List["Router"]]
-    targets: ClassVar[List[str]]
-    target_methods: ClassVar[List[str]]
+    routers: ClassVar[list["Router"]]
+    targets: ClassVar[list[str]]
+    target_methods: ClassVar[list[str]]
 
     # Automatically register all the subclasses in this dict
-    __registry: ClassVar[Dict[str, Type["Mocker"]]] = {}
+    __registry: ClassVar[dict[str, type["Mocker"]]] = {}
     registry = MappingProxyType(__registry)
 
     def __init_subclass__(cls) -> None:

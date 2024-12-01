@@ -1,18 +1,7 @@
 import email
 from datetime import datetime
 from email.message import Message
-from typing import (
-    Any,
-    Dict,
-    List,
-    NamedTuple,
-    Optional,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-    cast,
-)
+from typing import Any, NamedTuple, Optional, TypeVar, Union, cast
 from urllib.parse import parse_qsl
 
 try:
@@ -24,19 +13,19 @@ import httpx
 
 
 class MultiItems(dict):
-    def get_list(self, key: str) -> List[Any]:
+    def get_list(self, key: str) -> list[Any]:
         try:
             return [self[key]]
         except KeyError:  # pragma: no cover
             return []
 
-    def multi_items(self) -> List[Tuple[str, Any]]:
+    def multi_items(self) -> list[tuple[str, Any]]:
         return list(self.items())
 
 
 def _parse_multipart_form_data(
     content: bytes, *, content_type: str, encoding: str
-) -> Tuple[MultiItems, MultiItems]:
+) -> tuple[MultiItems, MultiItems]:
     form_data = b"\r\n".join(
         (
             b"MIME-Version: 1.0",
@@ -70,7 +59,7 @@ def _parse_urlencoded_data(content: bytes, *, encoding: str) -> MultiItems:
     )
 
 
-def decode_data(request: httpx.Request) -> Tuple[MultiItems, MultiItems]:
+def decode_data(request: httpx.Request) -> tuple[MultiItems, MultiItems]:
     content = request.read()
     content_type = request.headers.get("Content-Type", "")
 
@@ -103,7 +92,7 @@ class SetCookie(
     )
 ):
     def __new__(
-        cls: Type[Self],
+        cls: type[Self],
         name: str,
         value: str,
         *,
@@ -119,7 +108,7 @@ class SetCookie(
         """
         https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#syntax
         """
-        attrs: Dict[str, Union[str, bool]] = {name: value}
+        attrs: dict[str, Union[str, bool]] = {name: value}
         if path is not None:
             attrs["Path"] = path
         if domain is not None:
